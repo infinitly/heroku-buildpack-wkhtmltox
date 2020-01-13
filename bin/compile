@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+BUILD_DIR=$1
+CACHE_DIR=$2
+
+WKHTMLTOX_VERSION=0.12.5-1
+DOWNLOAD_URL="https://downloads.wkhtmltopdf.org/${WKHTMLTOX_VERSION%*\.*}/${WKHTMLTOX_VERSION%-*}/wkhtmltox_$WKHTMLTOX_VERSION.bionic_amd64.deb"
+PACKAGE_FILENAME=${DOWNLOAD_URL##*/}
+PACKAGE_DIR="$CACHE_DIR/${PACKAGE_FILENAME%.*}"
+
+if [ ! -d "$PACKAGE_DIR" ]; then
+  if [ ! -f "$CACHE_DIR/$PACKAGE_FILENAME" ]; then
+    curl --location --output "$CACHE_DIR/$PACKAGE_FILENAME" $DOWNLOAD_URL
+  fi
+
+  dpkg --extract "$CACHE_DIR/$PACKAGE_FILENAME" "$PACKAGE_DIR"
+  rm "$CACHE_DIR/$PACKAGE_FILENAME"
+fi
+
+cp "$PACKAGE_DIR"/usr/local/bin/* "$BUILD_DIR"/bin/
