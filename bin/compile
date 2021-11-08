@@ -1,9 +1,30 @@
 #!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir> <env-dir>
+
+# fail fast
+set -e
+
+# debug
+# set -x
+
+unset GIT_DIR
 
 BUILD_DIR=$1
 CACHE_DIR=$2
 OS_VERSION_NAME="focal"
 WKHTMLTOX_VERSION=0.12.6-1
+
+BUILDPACK_DIR="$(dirname "$(dirname "$0")")"
+
+# vendor directories - inspired by the pgbouncer buildpack
+VENDORED_PGBOUNCER="vendor/wkhtmltopdf"
+
+# vendor pgbouncer into the slug
+PATH="$BUILD_DIR/$VENDORED_PGBOUNCER/bin:$PATH"
+
+mkdir -p "$BUILD_DIR/bin"
+mkdir -p "$BUILD_DIR/$VENDORED_PGBOUNCER"
+
 
 if [ "$STACK" = "heroku-16" ]; then
   OS_VERSION_NAME="xenial"
@@ -21,8 +42,24 @@ if [ ! -d "$PACKAGE_DIR" ]; then
   fi
 
   dpkg --extract "$CACHE_DIR/$PACKAGE_FILENAME" "$PACKAGE_DIR"
+  echo "---> Extracted in $PACKAGE_DIR"
   rm "$CACHE_DIR/$PACKAGE_FILENAME"
 fi
 
 mkdir -p "$BUILD_DIR/bin"
-cp "$PACKAGE_DIR"/usr/local/bin/* "$BUILD_DIR"/bin/
+mkdir -p "$BUILD_DIR/$VENDORED_PGBOUNCER/bin"
+
+
+echo "-----> wkhtmltopdf-buildpack: Moving the wkhtmltopdf script into app/bin"
+
+cp "$PACKAGE_DIR/usr/local/bin/wkhtmltopdf" "$BUILD_DIR/bin/wkhtmltopdf"
+cp "$PACKAGE_DIR/usr/local/bin/wkhtmltopdf" "$BUILD_DIR/$VENDORED_PGBOUNCER/bin/wkhtmltopdf"
+chmod +x "$BUILD_DIR/bin/wkhtmltopdf" 
+chmod +x "$BUILD_DIR/$VENDORED_PGBOUNCER/bin/wkhtmltopdf"
+
+echo "-----> wkhtmltopdf-buildpack: Moving the wkhtmltoimage script into app/bin"
+cp "$PACKAGE_DIR/usr/local/bin/wkhtmltoimage" "$BUILD_DIR/bin/wkhtmltoimage"
+cp "$PACKAGE_DIR/usr/local/bin/wkhtmltoimage" "$BUILD_DIR/$VENDORED_PGBOUNCER/bin/wkhtmltoimage"
+chmod +x "$BUILD_DIR/bin/wkhtmltoimage" 
+chmod +x "$BUILD_DIR/$VENDORED_PGBOUNCER/bin/wkhtmltoimage"
+
