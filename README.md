@@ -1,11 +1,11 @@
 # Heroku Buildpack: wkhtmltox
 
-Downloads wkhtmltox binaries
+Downloads wkhtmltox binaries and adds the executable to path
 
 ## Usage
 
 ```
-heroku buildpacks:add --index 1 https://github.com/infinitly/heroku-buildpack-wkhtmltox
+heroku buildpacks:add --index 1 https://github.com/WeLikeCode/heroku-buildpack-wkhtmltox
 ```
 
 ## Reference
