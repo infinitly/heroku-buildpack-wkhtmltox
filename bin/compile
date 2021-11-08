@@ -24,4 +24,5 @@ if [ ! -d "$PACKAGE_DIR" ]; then
   rm "$CACHE_DIR/$PACKAGE_FILENAME"
 fi
 
+mkdir -p "$BUILD_DIR/bin"
 cp "$PACKAGE_DIR"/usr/local/bin/* "$BUILD_DIR"/bin/
