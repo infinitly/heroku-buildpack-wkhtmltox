@@ -64,7 +64,7 @@ chmod +x "$BUILD_DIR/bin/wkhtmltoimage"
 chmod +x "$BUILD_DIR/$VENDORED_PGBOUNCER/bin/wkhtmltoimage"
 
 # valid only at runtime  https://stackoverflow.com/questions/22995788/how-to-set-config-path-in-heroku-buildpack
-echo "exporting PATH and LIBRARY_PATH" | indent
+echo "exporting PATH and LIBRARY_PATH" 
 PROFILE_PATH="$BUILD_DIR/.profile.d/wkhtmltopdf.sh"
 mkdir -p $(dirname $PROFILE_PATH)
 echo 'export PATH="$PATH:/app/$VENDORED_PGBOUNCER/bin"' >>"$PROFILE_PATH"
