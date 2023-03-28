@@ -15,7 +15,7 @@ heroku buildpacks:add --index 1 https://github.com/WeLikeCode/heroku-buildpack-w
 
 ## Contributors
 
-@infinitly
+@jplot
 
 @ciprianiacobescu
 
