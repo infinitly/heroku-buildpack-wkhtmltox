@@ -12,7 +12,8 @@ unset GIT_DIR
 BUILD_DIR=$1
 CACHE_DIR=$2
 OS_VERSION_NAME="focal"
-WKHTMLTOX_VERSION=0.12.6-1
+#WKHTMLTOX_VERSION=0.12.6-1
+WKHTMLTOX_VERSION=0.12.6.1-2
 
 BUILDPACK_DIR="$(dirname "$(dirname "$0")")"
 
@@ -30,6 +31,10 @@ if [ "$STACK" = "heroku-16" ]; then
   OS_VERSION_NAME="xenial"
 elif [ "$STACK" = "heroku-18" ]; then
   OS_VERSION_NAME="bionic"
+elif [ "$STACK" = "heroku-20" ]; then
+  OS_VERSION_NAME="focal"
+elif [ "$STACK" = "heroku-22" ]; then
+  OS_VERSION_NAME="jammy"
 fi
 
 DOWNLOAD_URL="https://github.com/wkhtmltopdf/packaging/releases/download/$WKHTMLTOX_VERSION/wkhtmltox_$WKHTMLTOX_VERSION.${OS_VERSION_NAME}_amd64.deb"
