@@ -11,3 +11,10 @@ heroku buildpacks:add --index 1 https://github.com/WeLikeCode/heroku-buildpack-w
 ## Reference
 
 [Heroku Buildpacks](https://devcenter.heroku.com/articles/buildpacks)
+
+
+## Contributors
+
+@infinitly
+@ciprianiacobescu
+@duquesnay
