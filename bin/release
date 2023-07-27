@@ -6,5 +6,5 @@ cat <<EOF
 addons: []
 default_process_types: {}
 config_vars:
-  PATH: $PATH:/app/vendor/wkhtmltopdf/bin/
+  PATH: $PATH:$BUILD_DIR/vendor/wkhtmltopdf/bin
 EOF
