@@ -14,10 +14,10 @@ CACHE_DIR=$2
 BUILDPACK_DIR="$(dirname "$(dirname "$0")")"
 
 # vendor directories
-VENDORED_WKHTMLTOX="vendor/wkhtmltopdf"
+VENDOR_DIR="vendor/wkhtmltopdf"
 
 # vendor wkhtmltopdf into the slug
-PATH="$BUILD_DIR/$VENDORED_WKHTMLTOX/bin:$PATH"
+PATH="$BUILD_DIR/$VENDOR_DIR/bin:$PATH"
 
 if [ "$STACK" = "heroku-16" ]; then
   OS_VERSION_NAME="xenial"
@@ -40,33 +40,45 @@ DOWNLOAD_URL="https://github.com/wkhtmltopdf/packaging/releases/download/$WKHTML
 PACKAGE_FILENAME=${DOWNLOAD_URL##*/}
 PACKAGE_DIR="$CACHE_DIR/${PACKAGE_FILENAME%.*}"
 
+function indent() {
+  c='s/^/       /'
+  case $(uname) in
+    Darwin) sed -l "$c";;
+    *)      sed -u "$c";;
+  esac
+}
+
+arrow() {
+  sed -u 's/^/-----> /'
+}
+
 if [ ! -d "$PACKAGE_DIR" ]; then
   if [ ! -f "$CACHE_DIR/$PACKAGE_FILENAME" ]; then
-    echo "-----> wkhtmltopdf-buildpack: Package URL: $DOWNLOAD_URL"
-    curl --location --output "$CACHE_DIR/$PACKAGE_FILENAME" $DOWNLOAD_URL
+    echo "wkhtmltopdf-buildpack: Package URL: $DOWNLOAD_URL" | arrow
+    curl --location --output "$CACHE_DIR/$PACKAGE_FILENAME" $DOWNLOAD_URL | indent
   fi
 
   dpkg --extract "$CACHE_DIR/$PACKAGE_FILENAME" "$PACKAGE_DIR"
-  echo "---> wkhtmltopdf-buildpack: Extracted in $PACKAGE_DIR"
+  echo "wkhtmltopdf-buildpack: Extracted in $PACKAGE_DIR" | arrow
   rm "$CACHE_DIR/$PACKAGE_FILENAME"
 fi
 
-echo "-----> wkhtmltopdf-buildpack: Setup"
+echo "wkhtmltopdf-buildpack: Setup" | arrow
 mkdir -p "$BUILD_DIR/bin"
-mkdir -p "$BUILD_DIR/$VENDORED_WKHTMLTOX/bin"
+mkdir -p "$BUILD_DIR/$VENDOR_DIR/bin"
 
-echo "-----> wkhtmltopdf-buildpack: Moving the wkhtmltopdf script into app/bin"
-cp "$PACKAGE_DIR/usr/local/bin/wkhtmltopdf" "$BUILD_DIR/$VENDORED_WKHTMLTOX/bin/wkhtmltopdf"
-chmod +x "$BUILD_DIR/$VENDORED_WKHTMLTOX/bin/wkhtmltopdf"
-ln -s "$BUILD_DIR/$VENDORED_WKHTMLTOX/bin/wkhtmltopdf" "$BUILD_DIR/bin/wkhtmltopdf"
+echo "wkhtmltopdf-buildpack: Moving the wkhtmltopdf script into app/bin" | arrow
+cp "$PACKAGE_DIR/usr/local/bin/wkhtmltopdf" "$BUILD_DIR/$VENDOR_DIR/bin/wkhtmltopdf"
+chmod +x "$BUILD_DIR/$VENDOR_DIR/bin/wkhtmltopdf"
+ln -s "$BUILD_DIR/$VENDOR_DIR/bin/wkhtmltopdf" "$BUILD_DIR/bin/wkhtmltopdf"
 
-echo "-----> wkhtmltopdf-buildpack: Moving the wkhtmltoimage script into app/bin"
-cp "$PACKAGE_DIR/usr/local/bin/wkhtmltoimage" "$BUILD_DIR/$VENDORED_WKHTMLTOX/bin/wkhtmltoimage"
-chmod +x "$BUILD_DIR/$VENDORED_WKHTMLTOX/bin/wkhtmltoimage"
-ln -s "$BUILD_DIR/$VENDORED_WKHTMLTOX/bin/wkhtmltoimage" "$BUILD_DIR/bin/wkhtmltoimage"
+echo "wkhtmltopdf-buildpack: Moving the wkhtmltoimage script into app/bin" | arrow
+cp "$PACKAGE_DIR/usr/local/bin/wkhtmltoimage" "$BUILD_DIR/$VENDOR_DIR/bin/wkhtmltoimage"
+chmod +x "$BUILD_DIR/$VENDOR_DIR/bin/wkhtmltoimage"
+ln -s "$BUILD_DIR/$VENDOR_DIR/bin/wkhtmltoimage" "$BUILD_DIR/bin/wkhtmltoimage"
 
-# valid only at runtime  https://stackoverflow.com/questions/22995788/how-to-set-config-path-in-heroku-buildpack
-echo "-----> wkhtmltopdf-buildpack: Exporting PATH"
+# valid only at runtime https://stackoverflow.com/questions/22995788/how-to-set-config-path-in-heroku-buildpack
+echo "wkhtmltopdf-buildpack: Exporting PATH" | arrow
 PROFILE_PATH="$BUILD_DIR/.profile.d/wkhtmltopdf.sh"
 mkdir -p $(dirname $PROFILE_PATH)
-echo 'export PATH="$PATH:/app/$VENDORED_WKHTMLTOX/bin"' >>"$PROFILE_PATH"
+echo "export PATH=\"\$PATH:/app/$VENDOR_DIR/bin\"" >>"$PROFILE_PATH"
